@@ -1,5 +1,6 @@
-extends layout
-
-block content
-  h1= title
-  p Welcome to #{title}
+p
+	table
+		- for (var x = 0; x < candidates.length; x++)
+			tr
+				td #{candidates[x].name}
+				td #{candidates[x].points}

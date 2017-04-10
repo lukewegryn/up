@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "pm2 restart app.js",
-    "test": "pm2 restart app.js && mocha",
-    "stop" : "pm2 stop app.js"
+    "start": "pm2 start ./bin/www",
+    "restart": "pm2 restart ./bin/www",
+    "test": "pm2 restart ./bin/www && sleep 1s && mocha",
+    "stop" : "pm2 stop ./bin/www"
   },
   "dependencies": {
     "body-parser": "~1.16.0",
@@ -14,11 +15,14 @@
     "express": "~4.14.1",
     "morgan": "~1.7.0",
     "pug": "~2.0.0-beta10",
-    "serve-favicon": "~2.3.2"
+    "serve-favicon": "~2.3.2",
+    "mongoose":"~4.9.4"
   },
   "devDependencies": {
     "mocha": "~3.2.0",
     "request": "~2.81.0",
-    "expect": "~1.20.2"
+    "expect": "~1.20.2",
+    "request-mocha": "~0.2.0",
+    "superagent": "~3.5.2"
   }
 }

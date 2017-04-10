@@ -32,6 +32,7 @@ router.get('/listCandidates', function(req, res, next){
 	Candidate.find(function(err, candidates){
 		//if (err) res.send(JSON.stringify(err))
 		res.send(JSON.stringify(candidates))
+		//res.render('candidates', { candidates: candidates });
 	})
 })
 
