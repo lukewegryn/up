@@ -3,7 +3,20 @@ var router = express.Router();
 var mongoose = require('mongoose')
 var models = require('../../models');
 
+var sess;
 
+router.post('/login',function(req,res,next){
+	// curl --data "username=lukewegryn&password=asdf" http://127.0.0.1:3000/api/login
+	if(req.body.username == "lukewegryn" && req.body.password == "asdf"){
+		sess=req.session
+		sess.email = "lukewegryn@gmail.com"
+		sess.username = "lukewegryn@gmail.com"
+		sess.auth = 1
+		res.send("Login Successful")
+	} else {
+		res.send("Login failed")
+	}
+})
 /* GET users listing. */
 router.post('/newCandidate', function(req, res, next) {
 	// curl --data "name=Test" http://127.0.0.1:3000/api/newCandidate
@@ -25,6 +38,11 @@ router.get('/updateCandidate', function(req, res, next){
 })
 
 router.get('/listCandidates', function(req, res, next){
+	sess = req.session
+	if(sess.auth != 1){
+		res.send("Not authorized.")
+		return
+	}
 	var db = mongoose.connection;
 
 	//db.on('error', function(){res.send("Connection error")})
