@@ -1,18 +1,15 @@
-var expect = require('expect'),
-    request = require('request')
+var request = require('superagent');
+var expect = require('expect');
 
-var port = 3000
-
-describe('GET', function() {
-  describe('GET /', function() {
-    it('should return 200 when a GET request is sent to /', function() {
-      request
-        .get('http://127.0.0.1:'+port+'/')
-        .on('response', function(res){
-          expect(res.status).to.equal(200)
-          done()
+// Test structure
+describe('GET /', function(){
+    it("should get a 200 response",function(done){
+        request.get('localhost:3000').end(function(err,res){
+            // TODO check that response is okay
+            //console.log(res)
+            expect(res).toExist;
+            expect(res.status).toEqual(200);
+            done();
         });
     });
-  });
 });
-
