@@ -27,10 +27,11 @@ table tr:nth-child(even) {
   </tr>
 </table>-->
 
-<p><a href="#/">Main</a></p>
-
+<a href="#/">Main</a>
 <a href="#login">Login</a>
 <a href="#vote">Vote</a>
+<a href="#users">Users</a>
+<a href="#register">Register</a>
 
 <div ng-view></div>
 
@@ -39,6 +40,11 @@ table tr:nth-child(even) {
 <script>
 host = "http://localhost:3000"
 var app = angular.module('myApp', ["ngRoute"]);
+
+// Create the factory that share the Fact
+app.factory('User', function(){
+  return { username: '' };
+});
 
 app.config(function($routeProvider) {
     $routeProvider
@@ -53,18 +59,24 @@ app.config(function($routeProvider) {
     .when("/vote", {
         templateUrl : "vote.htm",
         controller : "voteCtrl"
-    });
+    })
     .when("/users", {
         templateUrl : "users.htm",
         controller : "usersCtrl"
-    });
+    })
+    .when("/register", {
+        templateUrl : "register.htm",
+        controller : "registerCtrl"
+    })
 });
 
-app.controller('candidatesCtrl', function($scope, $http) {
-    $http.get(host + "/api/privileged/listCandidates")
+app.controller('candidatesCtrl', function($scope, $http, User) {
+	$scope.username = User.username
+    $http.get(host + "/api/registered/listCandidates")
     .then(function (response) {
+    	console.log(response.data)
     	if(response.data !== "Not authorized"){
-    		$scope.names = response.data;
+    		$scope.candidates = response.data;
     	}
     });
 });
@@ -72,10 +84,29 @@ app.controller('candidatesCtrl', function($scope, $http) {
 app.controller('usersCtrl', function($scope, $http) {
     $http.get(host + "/api/privileged/listUsers")
     .then(function (response) {
+    	console.log(response.data)
     	if(response.data !== "Not authorized"){
     		$scope.users = response.data;
     	}
     });
+});
+
+app.controller('registerCtrl', function($scope, $http, $route, $location, User) {
+    $scope.register = function(){
+    	$http.post(host + "/api/newUser", {
+    		'username': $scope.username
+    	})
+	    .then(function(response) {
+	        $scope.loginStatus = response.data
+	        //$route.reload()
+	        User.username = $scope.username
+	        $location.path('/');  
+	        console.log($scope.loginStatus)
+	    }, function(error) {
+		    console.log('Error:')
+		    console.log(error)
+		})
+    }
 });
 
 app.controller("loginCtrl", function ($scope, $http, $route, $location) {
@@ -86,8 +117,9 @@ app.controller("loginCtrl", function ($scope, $http, $route, $location) {
     	})
 	    .then(function(response) {
 	        $scope.loginStatus = response.data
-	        $route.reload()
-	         $location.path('/');  
+	        //$route.reload()
+	       	User.username = $scope.username
+	        $location.path('/');  
 	        console.log($scope.loginStatus)
 	    }, function(error) {
 		    console.log('Error:')

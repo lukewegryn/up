@@ -1,5 +1,9 @@
+<div ng-if="username">
+	<h2>Welcome, {{username}}</h2>
+</div>
+
 <table>
-  <tr ng-repeat="x in names">
+  <tr ng-repeat="x in candidates">
     <td>{{ x.name }}</td>
     <td>{{ x.points }}</td>
   </tr>

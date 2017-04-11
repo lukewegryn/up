@@ -22,14 +22,17 @@ router.post('/newUser', function(req,res,next){
 	var db = mongoose.connection;
 
 	var user_username = req.body.username
-	var user_password = req.body.password
+	var user_password = "" //req.body.password
 
 	//db.on('error', function(){res.send("Connection error")})
 	var User = models.user
-	var user = new User({ username: user_username, password: user_password, points:0})
+	var user = new User({ username: user_username, password: user_password, points:30})
 	user.save(function (err, user){
 		//if(err) res.send(JSON.stringify(err))
-		res.send("{New user created successfully}")
+		sess=req.session
+		sess.username = user_username
+		sess.auth = 2
+		res.send("New user created successfully.")
 	})
 })
 

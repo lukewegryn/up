@@ -63,7 +63,7 @@ app.use('/api/privileged', function (req, res, next){
 
 app.use('/api/registered', function (req, res, next){
 	sess = req.session
-	if(sess.auth != 2 || sess.auth != 1){
+	if(sess.auth != 2 && sess.auth != 1){
 		res.send("Not authorized")
 		return
 	} else {
