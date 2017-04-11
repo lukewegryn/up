@@ -17,8 +17,35 @@ router.post('/login',function(req,res,next){
 		res.send("Login failed")
 	}
 })
+
+router.post('/newUser', function(req,res,next){
+	var db = mongoose.connection;
+
+	var user_username = req.body.username
+	var user_password = req.body.password
+
+	//db.on('error', function(){res.send("Connection error")})
+	var User = models.user
+	var user = new User({ username: user_username, password: user_password, points:0})
+	user.save(function (err, user){
+		//if(err) res.send(JSON.stringify(err))
+		res.send("{New user created successfully}")
+	})
+})
+
+router.get('/privileged/listUsers', function(req, res, next){
+	var db = mongoose.connection;
+
+	//db.on('error', function(){res.send("Connection error")})
+	var User = models.user
+	User.find(function(err, users){
+		//if (err) res.send(JSON.stringify(err))
+		res.send(JSON.stringify(users))
+		//res.render('candidates', { candidates: candidates });
+	})
+})
 /* GET users listing. */
-router.post('/newCandidate', function(req, res, next) {
+router.post('/privileged/newCandidate', function(req, res, next) {
 	// curl --data "name=Test" http://127.0.0.1:3000/api/newCandidate
 	var db = mongoose.connection;
 
@@ -33,11 +60,11 @@ router.post('/newCandidate', function(req, res, next) {
 	})
 })
 
-router.get('/updateCandidate', function(req, res, next){
+router.get('/privileged/updateCandidate', function(req, res, next){
 	res.send('Update Candidates')
 })
 
-router.get('/privileged/listCandidates', function(req, res, next){
+router.get('/registered/listCandidates', function(req, res, next){
 	var db = mongoose.connection;
 
 	//db.on('error', function(){res.send("Connection error")})

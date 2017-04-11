@@ -14,26 +14,91 @@ table tr:nth-child(even) {
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+
 <body>
 
-<div ng-app="myApp" ng-controller="candidatesCtrl">
+<div ng-app="myApp">
 
-<table>
+<!--<table>
   <tr ng-repeat="x in names">
     <td>{{ x.name }}</td>
     <td>{{ x.points }}</td>
   </tr>
-</table>
+</table>-->
+
+<p><a href="#/">Main</a></p>
+
+<a href="#login">Login</a>
+<a href="#vote">Vote</a>
+
+<div ng-view></div>
 
 </div>
 
 <script>
-host = "http://localhost:3000/"
-var app = angular.module('myApp', []);
-app.controller('candidatesCtrl', function($scope, $http) {
-    $http.get(host + "api/listCandidates")
-    .then(function (response) {$scope.names = response.data;});
+host = "http://localhost:3000"
+var app = angular.module('myApp', ["ngRoute"]);
+
+app.config(function($routeProvider) {
+    $routeProvider
+    .when("/", {
+        templateUrl : "main.htm",
+        controller : "candidatesCtrl"
+    })
+    .when("/login", {
+        templateUrl : "login.htm",
+        controller : "loginCtrl"
+    })
+    .when("/vote", {
+        templateUrl : "vote.htm",
+        controller : "voteCtrl"
+    });
+    .when("/users", {
+        templateUrl : "users.htm",
+        controller : "usersCtrl"
+    });
 });
+
+app.controller('candidatesCtrl', function($scope, $http) {
+    $http.get(host + "/api/privileged/listCandidates")
+    .then(function (response) {
+    	if(response.data !== "Not authorized"){
+    		$scope.names = response.data;
+    	}
+    });
+});
+
+app.controller('usersCtrl', function($scope, $http) {
+    $http.get(host + "/api/privileged/listUsers")
+    .then(function (response) {
+    	if(response.data !== "Not authorized"){
+    		$scope.users = response.data;
+    	}
+    });
+});
+
+app.controller("loginCtrl", function ($scope, $http, $route, $location) {
+    $scope.login = function(){
+    	$http.post(host + "/api/login", {
+    		'username': $scope.username,
+    		'password': $scope.password
+    	})
+	    .then(function(response) {
+	        $scope.loginStatus = response.data
+	        $route.reload()
+	         $location.path('/');  
+	        console.log($scope.loginStatus)
+	    }, function(error) {
+		    console.log('Error:')
+		    console.log(error)
+		})
+    }
+});
+app.controller("voteCtrl", function ($scope) {
+    $scope.msg = "I love Paris";
+});
+
 </script>
 
 </body>
