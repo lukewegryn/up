@@ -97,6 +97,20 @@ router.get('/privileged/updateCandidate', function(req, res, next){
 	res.send('Update Candidates')
 })
 
+router.post('/registered/upvote/', function(req, res, next){
+	var Candidate = models.candidate
+	Candidate.findOneAndUpdate({_id: req.body.id}, {$inc: {"points":1}}, function(err, candidates){
+		//if (err) res.send(JSON.stringify(err))
+		if (err) {
+			res.send(JSON.stringify({success:false, message:err}))
+			return
+		} else {
+			res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
+			return
+		}
+	})
+})
+
 router.get('/registered/listCandidates', function(req, res, next){
 	var db = mongoose.connection;
 

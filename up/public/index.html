@@ -73,7 +73,7 @@ app.config(function($routeProvider) {
     })
 });
 
-app.controller('candidatesCtrl', function($scope, $http, User) {
+app.controller('candidatesCtrl', function($scope, $http, User, $route) {
 	$scope.username = User.username
     $http.get(host + "/api/registered/listCandidates")
     .then(function (response) {
@@ -82,6 +82,25 @@ app.controller('candidatesCtrl', function($scope, $http, User) {
     		$scope.candidates = response.data;
     	}
     });
+
+    $scope.upvote = function(id){
+    	console.log(id.x._id)
+    	$http.post(host + "/api/registered/upvote", {
+    		'id': id.x._id
+    	})
+	    .then(function(response) {
+	        if(response.data.success == true){
+	       		console.log(response.data.points) 
+	       		id.x.points = id.x.points + 1
+	        } else {
+	        	console.log(response.data.message) 
+	        }
+	        console.log(response.data)
+	    }, function(error) {
+		    console.log('Error:')
+		    console.log(error)
+		})
+    }
 });
 
 app.controller('usersCtrl', function($scope, $http) {

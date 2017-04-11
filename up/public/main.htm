@@ -4,7 +4,8 @@
 
 <table>
   <tr ng-repeat="x in candidates">
-    <td><span><i class="fa fa-arrow-up" aria-hidden="true"></i></span></td>
+    <td ng-click="upvote(this)"><span><i class="fa fa-arrow-up" aria-hidden="true"></i></span></td>
+    <td style="display:none;">{{ x._id }}</td>
     <td>{{ x.name }}</td>
     <td>{{ x.points }}</td>
   </tr>
