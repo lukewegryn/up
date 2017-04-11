@@ -51,7 +51,18 @@ app.use(function (req, res, next) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/api/privileged', function (req, res, next){
+	sess = req.session
+	if(sess.auth != 1){
+		res.send("Not authorized.")
+		return
+	} else {
+		next()
+	}
+})
+
 app.use('/api', candidate);
+
 app.use('/', index);
 // Add headers
 //app.use('/users', users);

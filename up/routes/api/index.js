@@ -37,12 +37,7 @@ router.get('/updateCandidate', function(req, res, next){
 	res.send('Update Candidates')
 })
 
-router.get('/listCandidates', function(req, res, next){
-	sess = req.session
-	if(sess.auth != 1){
-		res.send("Not authorized.")
-		return
-	}
+router.get('/privileged/listCandidates', function(req, res, next){
 	var db = mongoose.connection;
 
 	//db.on('error', function(){res.send("Connection error")})
