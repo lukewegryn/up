@@ -7,14 +7,32 @@ var sess;
 
 router.post('/login',function(req,res,next){
 	// curl --data "username=lukewegryn&password=asdf" http://127.0.0.1:3000/api/login
+	var db = mongoose.connection;
+
 	if(req.body.username == "lukewegryn" && req.body.password == "asdf"){
-		sess=req.session
-		sess.email = "lukewegryn@gmail.com"
-		sess.username = "lukewegryn@gmail.com"
-		sess.auth = 1
-		res.send("Login Successful")
-	} else {
-		res.send("Login failed")
+			sess=req.session
+			sess.email = "lukewegryn@gmail.com"
+			sess.username = "lukewegryn@gmail.com"
+			sess.auth = 1
+			res.send({success: true})
+			return
+	} else{
+		//db.on('error', function(){res.send("Connection error")})
+		var User = models.user
+		User.find({ username: req.body.username, password: req.body.password},function(err, users){
+			//if (err) res.send(JSON.stringify(err))
+			if (users.length > 0) {
+				sess=req.session
+				sess.username = req.body.username
+				sess.auth = 2
+				res.send({success: true})
+				return
+			} else {
+				res.send({success: false})
+				return
+			}
+			//res.render('candidates', { candidates: candidates });
+		})
 	}
 })
 
@@ -24,6 +42,11 @@ router.post('/newUser', function(req,res,next){
 	var user_username = req.body.username
 	var user_password = "" //req.body.password
 
+	if (!user_username){
+		res.send(JSON.stringify({success:false}))
+		return
+	}
+
 	//db.on('error', function(){res.send("Connection error")})
 	var User = models.user
 	var user = new User({ username: user_username, password: user_password, points:30})
@@ -32,7 +55,7 @@ router.post('/newUser', function(req,res,next){
 		sess=req.session
 		sess.username = user_username
 		sess.auth = 2
-		res.send("New user created successfully.")
+		res.send(JSON.stringify({success:true}))
 	})
 })
 
@@ -43,6 +66,7 @@ router.get('/privileged/listUsers', function(req, res, next){
 	var User = models.user
 	User.find(function(err, users){
 		//if (err) res.send(JSON.stringify(err))
+		users.success = true
 		res.send(JSON.stringify(users))
 		//res.render('candidates', { candidates: candidates });
 	})
@@ -59,7 +83,7 @@ router.post('/privileged/newCandidate', function(req, res, next) {
 	var candidate = new Candidate({ name: candidateName, points:0})
 	candidate.save(function (err, user){
 		//if(err) res.send(JSON.stringify(err))
-		res.send("{New candidate created successfully.}")
+		res.send(JSON.stringify({success:true}))
 	})
 })
 
@@ -74,6 +98,7 @@ router.get('/registered/listCandidates', function(req, res, next){
 	var Candidate = models.candidate
 	Candidate.find(function(err, candidates){
 		//if (err) res.send(JSON.stringify(err))
+		candidates.success = true
 		res.send(JSON.stringify(candidates))
 		//res.render('candidates', { candidates: candidates });
 	})

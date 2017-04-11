@@ -54,7 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/privileged', function (req, res, next){
 	sess = req.session
 	if(sess.auth != 1){
-		res.send("Not authorized")
+		res.send(JSON.stringify({success:false}))
 		return
 	} else {
 		next()
@@ -64,7 +64,7 @@ app.use('/api/privileged', function (req, res, next){
 app.use('/api/registered', function (req, res, next){
 	sess = req.session
 	if(sess.auth != 2 && sess.auth != 1){
-		res.send("Not authorized")
+		res.send(JSON.stringify({success:false}))
 		return
 	} else {
 		next()

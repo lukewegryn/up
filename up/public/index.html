@@ -75,7 +75,7 @@ app.controller('candidatesCtrl', function($scope, $http, User) {
     $http.get(host + "/api/registered/listCandidates")
     .then(function (response) {
     	console.log(response.data)
-    	if(response.data !== "Not authorized"){
+    	if(response.data.success !== false){
     		$scope.candidates = response.data;
     	}
     });
@@ -85,7 +85,7 @@ app.controller('usersCtrl', function($scope, $http) {
     $http.get(host + "/api/privileged/listUsers")
     .then(function (response) {
     	console.log(response.data)
-    	if(response.data !== "Not authorized"){
+    	if(response.data.success !== false){
     		$scope.users = response.data;
     	}
     });
@@ -97,11 +97,11 @@ app.controller('registerCtrl', function($scope, $http, $route, $location, User) 
     		'username': $scope.username
     	})
 	    .then(function(response) {
-	        $scope.loginStatus = response.data
-	        //$route.reload()
-	        User.username = $scope.username
-	        $location.path('/');  
-	        console.log($scope.loginStatus)
+	        if(response.data.success == true){
+	       		User.username = $scope.username
+	        	$location.path('/');  
+	        }
+	        console.log(response.data)
 	    }, function(error) {
 		    console.log('Error:')
 		    console.log(error)
@@ -109,18 +109,18 @@ app.controller('registerCtrl', function($scope, $http, $route, $location, User) 
     }
 });
 
-app.controller("loginCtrl", function ($scope, $http, $route, $location) {
+app.controller("loginCtrl", function ($scope, $http, $route, $location, User) {
     $scope.login = function(){
     	$http.post(host + "/api/login", {
     		'username': $scope.username,
     		'password': $scope.password
     	})
 	    .then(function(response) {
-	        $scope.loginStatus = response.data
-	        //$route.reload()
-	       	User.username = $scope.username
-	        $location.path('/');  
-	        console.log($scope.loginStatus)
+	        if(response.data.success == true){
+	        	User.username = $scope.username
+	        	$location.path('/');  
+	        }
+	        console.log(response.data)
 	    }, function(error) {
 		    console.log('Error:')
 		    console.log(error)
