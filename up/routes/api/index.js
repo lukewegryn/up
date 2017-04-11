@@ -7,8 +7,6 @@ var sess;
 
 router.post('/login',function(req,res,next){
 	// curl --data "username=lukewegryn&password=asdf" http://127.0.0.1:3000/api/login
-	var db = mongoose.connection;
-
 	if(req.body.username == "lukewegryn" && req.body.password == "asdf"){
 			sess=req.session
 			sess.email = "lukewegryn@gmail.com"
@@ -18,6 +16,7 @@ router.post('/login',function(req,res,next){
 			return
 	} else{
 		//db.on('error', function(){res.send("Connection error")})
+		var db = mongoose.connection;
 		var User = models.user
 		User.find({ username: req.body.username, password: req.body.password},function(err, users){
 			//if (err) res.send(JSON.stringify(err))
@@ -28,7 +27,7 @@ router.post('/login',function(req,res,next){
 				res.send({success: true})
 				return
 			} else {
-				res.send({success: false})
+				res.send({success: false, message: "The username or password is incorrect."})
 				return
 			}
 			//res.render('candidates', { candidates: candidates });
@@ -43,19 +42,26 @@ router.post('/newUser', function(req,res,next){
 	var user_password = "" //req.body.password
 
 	if (!user_username){
-		res.send(JSON.stringify({success:false}))
+		res.send(JSON.stringify({success:false, message: "The username must be at least one character."}))
 		return
 	}
-
-	//db.on('error', function(){res.send("Connection error")})
 	var User = models.user
-	var user = new User({ username: user_username, password: user_password, points:30})
-	user.save(function (err, user){
-		//if(err) res.send(JSON.stringify(err))
-		sess=req.session
-		sess.username = user_username
-		sess.auth = 2
-		res.send(JSON.stringify({success:true}))
+	User.find({ username: req.body.username},function(err, users){
+		//if (err) res.send(JSON.stringify(err))
+		if (users.length > 0) {
+			res.send({success: false, message: "That username is already in use."})
+			return
+		} else {
+			var user = new User({ username: user_username, password: user_password, points:30})
+			user.save(function (err, user){
+				//if(err) res.send(JSON.stringify(err))
+				sess=req.session
+				sess.username = user_username
+				sess.auth = 2
+				res.send(JSON.stringify({success:true}))
+				return
+			})
+		}
 	})
 })
 

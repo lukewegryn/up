@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en-US">
+<head>
+<link rel="stylesheet" type="text/css" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" />
+</head>
 <style>
 table, th , td  {
   border: 1px solid grey;
@@ -100,6 +103,8 @@ app.controller('registerCtrl', function($scope, $http, $route, $location, User) 
 	        if(response.data.success == true){
 	       		User.username = $scope.username
 	        	$location.path('/');  
+	        } else {
+	        	$scope.message = response.data.message
 	        }
 	        console.log(response.data)
 	    }, function(error) {
@@ -113,12 +118,14 @@ app.controller("loginCtrl", function ($scope, $http, $route, $location, User) {
     $scope.login = function(){
     	$http.post(host + "/api/login", {
     		'username': $scope.username,
-    		'password': $scope.password
+    		'password': $scope.password == undefined ? "" : $scope.password
     	})
 	    .then(function(response) {
 	        if(response.data.success == true){
 	        	User.username = $scope.username
 	        	$location.path('/');  
+	        } else {
+	        	$scope.message = response.data.message
 	        }
 	        console.log(response.data)
 	    }, function(error) {
