@@ -2,6 +2,7 @@
 <html lang="en-US">
 <head>
 <link rel="stylesheet" type="text/css" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" />
+<link rel="stylesheet" href="css/font-awesome-animation.css">
 </head>
 <style>
 table, th , td  {
@@ -30,11 +31,14 @@ table tr:nth-child(even) {
   </tr>
 </table>-->
 
-<a href="#/">Main</a>
-<a href="#login">Login</a>
-<a href="#vote">Vote</a>
-<a href="#users">Users</a>
-<a href="#register">Register</a>
+<div ng-controller="navCtrl">
+    <a href="#/">Main</a>
+    <a ng-show="!isRegistered()" href="#login">Login</a>
+    <a ng-show="isRegistered()" href="#vote">Vote</a>
+    <a ng-show="isPrivileged()" href="#users">Users</a>
+    <a ng-show="!isRegistered()" href="#register">Register</a>
+    <a ng-show="isPrivileged()" href="#candidates">Candidates</a>
+</div>
 
 <div ng-view></div>
 
@@ -46,14 +50,14 @@ var app = angular.module('myApp', ["ngRoute"]);
 
 // Create the factory that share the Fact
 app.factory('User', function(){
-  return { username: '' };
+  return { username: '', privilege: 0 };
 });
 
 app.config(function($routeProvider) {
     $routeProvider
     .when("/", {
         templateUrl : "main.htm",
-        controller : "candidatesCtrl"
+        controller : "mainCtrl"
     })
     .when("/login", {
         templateUrl : "login.htm",
@@ -71,35 +75,61 @@ app.config(function($routeProvider) {
         templateUrl : "register.htm",
         controller : "registerCtrl"
     })
+    .when("/candidates", {
+        templateUrl : "candidates.htm",
+        controller : "candidatesCtrl"
+    })
 });
 
-app.controller('candidatesCtrl', function($scope, $http, User, $route) {
-	$scope.username = User.username
-    $http.get(host + "/api/registered/listCandidates")
+app.controller('navCtrl', function($scope, $http, User) {
+
+    $http.get(host + "/api/currentPrivilege")
     .then(function (response) {
-    	console.log(response.data)
-    	if(response.data.success !== false){
-    		$scope.candidates = response.data;
-    	}
+        console.log(response.data)
+        if(response.data.success !== false){
+            User.privilege = response.data.privilege;
+            alert(User.privilege)
+        }
     });
 
-    $scope.upvote = function(id){
-    	console.log(id.x._id)
-    	$http.post(host + "/api/registered/upvote", {
-    		'id': id.x._id
-    	})
-	    .then(function(response) {
-	        if(response.data.success == true){
-	       		console.log(response.data.points) 
-	       		id.x.points = id.x.points + 1
-	        } else {
-	        	console.log(response.data.message) 
-	        }
-	        console.log(response.data)
-	    }, function(error) {
-		    console.log('Error:')
-		    console.log(error)
-		})
+    $scope.isRegistered = function(status) {
+        if(User.privilege == 1 || User.privilege == 2){
+            return true
+        } else {
+            return false
+        }
+    };
+    $scope.isPrivileged = function(status) {
+        if(User.privilege == 1){
+            return true
+        } else {
+            return false
+        }
+    };
+
+});
+
+app.controller('mainCtrl', function($scope, $http, User, $route) {
+
+});
+
+app.controller('candidatesCtrl', function($scope, $http, $location) {
+    $scope.create_candidate = function(){
+        $http.post(host + "/api/privileged/newCandidate", {
+            'candidate_name': $scope.candidate_name
+        })
+        .then(function(response) {
+            if(response.data.success == true){
+                //$location.path('/');
+                $scope.message = response.data.message 
+                console.log(response.data) 
+            } else {
+                console.log(response.data)
+            }
+        }, function(error) {
+            console.log('Error:')
+            console.log(error)
+        })
     }
 });
 
@@ -121,6 +151,8 @@ app.controller('registerCtrl', function($scope, $http, $route, $location, User) 
 	    .then(function(response) {
 	        if(response.data.success == true){
 	       		User.username = $scope.username
+                console.log(response.data)
+                User.privilege = response.data.privilege
 	        	$location.path('/');  
 	        } else {
 	        	$scope.message = response.data.message
@@ -142,6 +174,8 @@ app.controller("loginCtrl", function ($scope, $http, $route, $location, User) {
 	    .then(function(response) {
 	        if(response.data.success == true){
 	        	User.username = $scope.username
+                User.privilege = response.data.privilege
+                console.log(response.data)
 	        	$location.path('/');  
 	        } else {
 	        	$scope.message = response.data.message
@@ -153,8 +187,37 @@ app.controller("loginCtrl", function ($scope, $http, $route, $location, User) {
 		})
     }
 });
-app.controller("voteCtrl", function ($scope) {
-    $scope.msg = "I love Paris";
+app.controller("voteCtrl", function ($scope, $http, User) {
+    $scope.orderByField = 'points';
+    $scope.reverseSort = true;
+
+    $scope.username = User.username
+    $http.get(host + "/api/registered/listCandidates")
+    .then(function (response) {
+        console.log(response.data)
+        if(response.data.success !== false){
+            $scope.candidates = response.data;
+        }
+    });
+
+    $scope.upvote = function(id){
+        console.log(id.x._id)
+        $http.post(host + "/api/registered/upvote", {
+            'id': id.x._id
+        })
+        .then(function(response) {
+            if(response.data.success == true){
+                console.log(response.data.points) 
+                id.x.points = id.x.points + 1
+            } else {
+                console.log(response.data.message) 
+            }
+            console.log(response.data)
+        }, function(error) {
+            console.log('Error:')
+            console.log(error)
+        })
+    }
 });
 
 </script>

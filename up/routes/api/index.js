@@ -12,7 +12,7 @@ router.post('/login',function(req,res,next){
 			sess.email = "lukewegryn@gmail.com"
 			sess.username = "lukewegryn@gmail.com"
 			sess.auth = 1
-			res.send({success: true})
+			res.send({success: true, privilege:1})
 			return
 	} else{
 		//db.on('error', function(){res.send("Connection error")})
@@ -24,7 +24,7 @@ router.post('/login',function(req,res,next){
 				sess=req.session
 				sess.username = req.body.username
 				sess.auth = 2
-				res.send({success: true})
+				res.send({success: true, privilege:2})
 				return
 			} else {
 				res.send({success: false, message: "The username or password is incorrect."})
@@ -58,10 +58,53 @@ router.post('/newUser', function(req,res,next){
 				sess=req.session
 				sess.username = user_username
 				sess.auth = 2
-				res.send(JSON.stringify({success:true}))
+				res.send(JSON.stringify({success:true, privilege:2}))
 				return
 			})
 		}
+	})
+})
+
+router.get('/currentPrivilege', function(req, res, next){
+	sess=req.session
+	if (sess.auth){
+		res.send(JSON.stringify({success:true, privilege:sess.auth}))
+	} else {
+		res.send(JSON.stringify({success:true, privilege:0}))
+	}
+})
+
+router.post('/registered/upvote/', function(req, res, next){
+	var Candidate = models.candidate
+	Candidate.findOneAndUpdate({_id: req.body.id}, {$inc: {"points":1}}, function(err, candidates){
+		//if (err) res.send(JSON.stringify(err))
+		if (err) {
+			res.send(JSON.stringify({success:false, message:err}))
+			return
+		} else {
+			var User = models.user
+			sess=req.session
+			User.findOneAndUpdate({username: sess.username}, {$dec: {"points":1}}, function(err2, users){
+				if (err) {
+					res.send(JSON.stringify({success:false, message:err2}))
+				}
+			})
+			res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
+			return
+		}
+	})
+})
+
+router.get('/registered/listCandidates', function(req, res, next){
+	var db = mongoose.connection;
+
+	//db.on('error', function(){res.send("Connection error")})
+	var Candidate = models.candidate
+	Candidate.find(function(err, candidates){
+		//if (err) res.send(JSON.stringify(err))
+		candidates.success = true
+		res.send(JSON.stringify(candidates))
+		//res.render('candidates', { candidates: candidates });
 	})
 })
 
@@ -82,46 +125,22 @@ router.post('/privileged/newCandidate', function(req, res, next) {
 	// curl --data "name=Test" http://127.0.0.1:3000/api/newCandidate
 	var db = mongoose.connection;
 
-	var candidateName = req.body.name
+	var candidate_name = req.body.candidate_name
 
 	//db.on('error', function(){res.send("Connection error")})
 	var Candidate = models.candidate
-	var candidate = new Candidate({ name: candidateName, points:0})
+	var candidate = new Candidate({ name: candidate_name, points:0})
 	candidate.save(function (err, user){
-		//if(err) res.send(JSON.stringify(err))
-		res.send(JSON.stringify({success:true}))
+		if(err) {
+			res.send(JSON.stringify({success:false, message:"Unable to create a candidate."}))
+			return
+		}
+		res.send(JSON.stringify({success:true, message:"" + candidate_name + " created sucessfully!"}))
 	})
 })
 
 router.get('/privileged/updateCandidate', function(req, res, next){
 	res.send('Update Candidates')
-})
-
-router.post('/registered/upvote/', function(req, res, next){
-	var Candidate = models.candidate
-	Candidate.findOneAndUpdate({_id: req.body.id}, {$inc: {"points":1}}, function(err, candidates){
-		//if (err) res.send(JSON.stringify(err))
-		if (err) {
-			res.send(JSON.stringify({success:false, message:err}))
-			return
-		} else {
-			res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
-			return
-		}
-	})
-})
-
-router.get('/registered/listCandidates', function(req, res, next){
-	var db = mongoose.connection;
-
-	//db.on('error', function(){res.send("Connection error")})
-	var Candidate = models.candidate
-	Candidate.find(function(err, candidates){
-		//if (err) res.send(JSON.stringify(err))
-		candidates.success = true
-		res.send(JSON.stringify(candidates))
-		//res.render('candidates', { candidates: candidates });
-	})
 })
 
 module.exports = router;
