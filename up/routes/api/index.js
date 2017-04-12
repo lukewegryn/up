@@ -10,7 +10,7 @@ router.post('/login',function(req,res,next){
 	if(req.body.username == "lukewegryn" && req.body.password == "asdf"){
 			sess=req.session
 			sess.email = "lukewegryn@gmail.com"
-			sess.username = "lukewegryn@gmail.com"
+			sess.username = "lukewegryn"
 			sess.auth = 1
 			res.send({success: true, privilege:1})
 			return
@@ -68,7 +68,7 @@ router.post('/newUser', function(req,res,next){
 router.get('/currentPrivilege', function(req, res, next){
 	sess=req.session
 	if (sess.auth){
-		res.send(JSON.stringify({success:true, privilege:sess.auth}))
+		res.send(JSON.stringify({success:true, username:sess.username, privilege:sess.auth}))
 	} else {
 		res.send(JSON.stringify({success:true, privilege:0}))
 	}
@@ -84,13 +84,13 @@ router.post('/registered/upvote/', function(req, res, next){
 		} else {
 			var User = models.user
 			sess=req.session
-			User.findOneAndUpdate({username: sess.username}, {$dec: {"points":1}}, function(err2, users){
+			User.findOneAndUpdate({username: sess.username}, {$inc: {"points":-1}}, function(err2, users){
 				if (err) {
 					res.send(JSON.stringify({success:false, message:err2}))
 				}
+				res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
+				return
 			})
-			res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
-			return
 		}
 	})
 })

@@ -88,7 +88,7 @@ app.controller('navCtrl', function($scope, $http, User) {
         console.log(response.data)
         if(response.data.success !== false){
             User.privilege = response.data.privilege;
-            alert(User.privilege)
+            User.username = response.data.username;
         }
     });
 
