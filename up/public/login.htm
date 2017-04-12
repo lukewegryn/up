@@ -1,10 +1,23 @@
-<h1>Login</h1>
-<h3>Please login below.</h3>
+<div class="page-header">
+    <h1>Login</h1>
+</div>
 <div ng-if="message">
 	<h4>{{message}}</h4>
 </div>
 <form>
-Username: <input type="text" ng-model="username">
-Password: <input type="password" ng-model="password">
-<button ng-click="login()">Log In</button>
+    <div class="form-group">
+        <div class="input-group input-group-lg">
+            <span class="input-group-addon">Username</span>
+            <input type="text" ng-model="username" class="form-control">
+        </div>
+        <br>
+        <div class="input-group input-group-lg">
+            <span class="input-group-addon">Password</span>
+            <input type="password" ng-model="password" class="form-control">
+        </div>
+        <br>
+        <div class="text-center">
+            <button ng-click="login()" type="submit" class="btn btn-lg btn-default">Log In</button>
+        </div>
+    </div>
 </form>

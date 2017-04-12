@@ -1,6 +1,19 @@
-<table>
-  <tr ng-repeat="x in users">
-    <td>{{ x.username }}</td>
-    <td>{{ x.points }}</td>
-  </tr>
-</table>
+<div class="page-header">
+    <h1>Users</h1>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">Registered Users</div>
+    <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr><th>username</th><th>points</th></tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="x in users">
+            <td>{{ x.username }}</td>
+            <td>{{ x.points }}</td>
+          </tr>
+          </tbody>
+        </table>
+    </table>
+</div>
