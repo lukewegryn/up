@@ -12,6 +12,7 @@
 </head>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-touch.js"></script>
 <script src="https://js.pusher.com/4.0/pusher.min.js"></script>
 
 <body>
@@ -74,7 +75,7 @@ var pusher = new Pusher('ba3b3cba4d81f78b5a20', {
 
     // Enable pusher logging - don't include this in production
 
-var app = angular.module('myApp', ["ngRoute"]);
+var app = angular.module('myApp', ["ngRoute",'ngTouch']);
 
 // Create the factory that share the Fact
 app.factory('User', function(){
@@ -212,6 +213,7 @@ app.controller('registerCtrl', function($scope, $http, $route, $location, User) 
 
 app.controller("loginCtrl", function ($scope, $http, $route, $location, User) {
     $scope.login = function(){
+        //alert(1);
     	$http.post(host + "/api/login", {
     		'username': $scope.username,
     		'password': $scope.password == undefined ? "" : $scope.password
