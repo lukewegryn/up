@@ -3,36 +3,42 @@ var router = express.Router();
 var mongoose = require('mongoose')
 var models = require('../../models');
 
-var sess;
+var sess
+var Pusher = require('pusher')
+var pusher = new Pusher({
+  appId: '327047',
+  key: 'ba3b3cba4d81f78b5a20',
+  secret: '601da58ca7dbfa351a96',
+  encrypted: true
+});
+
 
 router.post('/login',function(req,res,next){
 	// curl --data "username=lukewegryn&password=asdf" http://127.0.0.1:3000/api/login
-	if(req.body.username == "lukewegryn" && req.body.password == "asdf"){
-			sess=req.session
-			sess.email = "lukewegryn@gmail.com"
-			sess.username = "lukewegryn"
-			sess.auth = 1
-			res.send({success: true, privilege:1})
-			return
-	} else{
 		//db.on('error', function(){res.send("Connection error")})
-		var db = mongoose.connection;
-		var User = models.user
-		User.find({ username: req.body.username, password: req.body.password},function(err, users){
-			//if (err) res.send(JSON.stringify(err))
-			if (users.length > 0) {
-				sess=req.session
-				sess.username = req.body.username
-				sess.auth = 2
-				res.send({success: true, privilege:2})
-				return
-			} else {
-				res.send({success: false, message: "The username or password is incorrect."})
-				return
-			}
-			//res.render('candidates', { candidates: candidates });
-		})
-	}
+	var db = mongoose.connection;
+	var User = models.user
+	User.findOne({ username: req.body.username, password: req.body.password},function(err, user){
+		//if (err) res.send(JSON.stringify(err))
+		if (user) {
+			sess=req.session
+			sess.username = req.body.username
+			console.log(user)
+			console.log(user.privilege)
+			sess.auth = user.privilege
+			res.send({success: true, privilege: user.privilege})
+			return
+		} else {
+			res.send({success: false, message: "The username or password is incorrect."})
+			return
+		}
+		//res.render('candidates', { candidates: candidates });
+	})
+})
+
+router.get('/registered/logout', function(req,res,next){
+	req.session.destroy();
+	res.send({success: true, message: "Logged out successfully."})
 })
 
 router.post('/newUser', function(req,res,next){
@@ -52,7 +58,7 @@ router.post('/newUser', function(req,res,next){
 			res.send({success: false, message: "That username is already in use."})
 			return
 		} else {
-			var user = new User({ username: user_username, password: user_password, points:30})
+			var user = new User({ username: user_username, password: user_password, points:30, privilege:2})
 			user.save(function (err, user){
 				//if(err) res.send(JSON.stringify(err))
 				sess=req.session
@@ -74,22 +80,44 @@ router.get('/currentPrivilege', function(req, res, next){
 	}
 })
 
+router.get('/registered/pointsRemaining', function(req, res, next){
+	var User = models.user
+	sess=req.session
+	User.findOne({username: sess.username}, function(err,user){
+		if(err){
+			res.send(JSON.stringify({success:false,message:err}))
+		} else {
+			res.send(JSON.stringify({success:true, points:user.points}))
+		}
+	})
+})
+
 router.post('/registered/upvote/', function(req, res, next){
-	var Candidate = models.candidate
-	Candidate.findOneAndUpdate({_id: req.body.id}, {$inc: {"points":1}}, function(err, candidates){
-		//if (err) res.send(JSON.stringify(err))
-		if (err) {
-			res.send(JSON.stringify({success:false, message:err}))
+	var User = models.user
+	sess=req.session
+	User.findOne({username: sess.username}, function(err,user){
+		if (user.points <= 0){
+			res.send(JSON.stringify({success:false,message:"You are out of points!"}))
 			return
 		} else {
-			var User = models.user
-			sess=req.session
 			User.findOneAndUpdate({username: sess.username}, {$inc: {"points":-1}}, function(err2, users){
 				if (err) {
 					res.send(JSON.stringify({success:false, message:err2}))
 				}
-				res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
-				return
+				var Candidate = models.candidate
+				Candidate.findOneAndUpdate({_id: req.body.id}, {$inc: {"points":1}}, function(err, candidates){
+					//if (err) res.send(JSON.stringify(err))
+					if (err) {
+						res.send(JSON.stringify({success:false, message:err}))
+						return
+					} else {
+						pusher.trigger('upvote-channel', 'upvote-event', {
+							  "message": "update"
+							});
+						res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
+						return
+					}
+				})
 			})
 		}
 	})

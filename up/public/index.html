@@ -19,6 +19,7 @@ table tr:nth-child(even) {
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+<script src="https://js.pusher.com/4.0/pusher.min.js"></script>
 
 <body>
 
@@ -38,6 +39,7 @@ table tr:nth-child(even) {
     <a ng-show="isPrivileged()" href="#users">Users</a>
     <a ng-show="!isRegistered()" href="#register">Register</a>
     <a ng-show="isPrivileged()" href="#candidates">Candidates</a>
+    <a ng-show="isRegistered()" href="#logout">Logout</a>
 </div>
 
 <div ng-view></div>
@@ -46,6 +48,12 @@ table tr:nth-child(even) {
 
 <script>
 host = "http://localhost:3000"
+var pusher = new Pusher('ba3b3cba4d81f78b5a20', {
+  encrypted: true
+});
+
+    // Enable pusher logging - don't include this in production
+
 var app = angular.module('myApp', ["ngRoute"]);
 
 // Create the factory that share the Fact
@@ -79,14 +87,19 @@ app.config(function($routeProvider) {
         templateUrl : "candidates.htm",
         controller : "candidatesCtrl"
     })
+    .when("/logout", {
+        template : "<h3>You have been logged out.</h3>",
+        controller : "logoutCtrl"
+    })
 });
 
 app.controller('navCtrl', function($scope, $http, User) {
 
     $http.get(host + "/api/currentPrivilege")
     .then(function (response) {
-        console.log(response.data)
         if(response.data.success !== false){
+            console.log("Reloading navCtrl...")
+            console.log(response.data)
             User.privilege = response.data.privilege;
             User.username = response.data.username;
         }
@@ -106,11 +119,23 @@ app.controller('navCtrl', function($scope, $http, User) {
             return false
         }
     };
-
 });
 
 app.controller('mainCtrl', function($scope, $http, User, $route) {
 
+});
+
+app.controller('logoutCtrl', function($scope, $http, User, $location, $route) {
+    $http.get(host + "/api/registered/logout")
+    .then(function (response) {
+        console.log(response.data)
+        if(response.data.success == true){
+            User.username = ""
+            User.privilege = 0
+            $location.path('/');
+            //$route.reload()
+        }
+    });
 });
 
 app.controller('candidatesCtrl', function($scope, $http, $location) {
@@ -188,17 +213,41 @@ app.controller("loginCtrl", function ($scope, $http, $route, $location, User) {
     }
 });
 app.controller("voteCtrl", function ($scope, $http, User) {
+
+    var getVotes = function(){
+        $http.get(host + "/api/registered/listCandidates")
+        .then(function (response) {
+            console.log(response.data)
+            if(response.data.success !== false){
+                $scope.candidates = response.data;
+            }
+        });
+    }
+
+    var getPointsRemaining = function(){
+        $http.get(host + "/api/registered/pointsRemaining")
+        .then(function (response) {
+            console.log(response.data)
+            if(response.data.success !== false){
+                $scope.pointsRemaining = response.data.points;
+            } else {
+                $scope.pointsRemaining = 0;
+            }
+        });
+    }
+
+    Pusher.logToConsole = true;
+    var channel = pusher.subscribe('upvote-channel');
+    channel.bind('upvote-event', function(data) {
+      getVotes()
+    });
+
+    getPointsRemaining()
     $scope.orderByField = 'points';
     $scope.reverseSort = true;
 
     $scope.username = User.username
-    $http.get(host + "/api/registered/listCandidates")
-    .then(function (response) {
-        console.log(response.data)
-        if(response.data.success !== false){
-            $scope.candidates = response.data;
-        }
-    });
+    getVotes()
 
     $scope.upvote = function(id){
         console.log(id.x._id)
@@ -217,6 +266,7 @@ app.controller("voteCtrl", function ($scope, $http, User) {
             console.log('Error:')
             console.log(error)
         })
+        getPointsRemaining()
     }
 });
 
