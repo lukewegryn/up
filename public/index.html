@@ -198,30 +198,6 @@ app.controller('candidateModalCtrl', function($scope, $http, $route, $uibModal, 
     });
   };
 
-  $ctrl.openMultipleModals = function () {
-    $uibModal.open({
-      animation: $ctrl.animationsEnabled,
-      ariaLabelledBy: 'modal-title-bottom',
-      ariaDescribedBy: 'modal-body-bottom',
-      templateUrl: 'stackedModal.html',
-      size: 'sm',
-      controller: function($scope) {
-        $scope.name = 'bottom';  
-      }
-    });
-
-    $uibModal.open({
-      animation: $ctrl.animationsEnabled,
-      ariaLabelledBy: 'modal-title-top',
-      ariaDescribedBy: 'modal-body-top',
-      templateUrl: 'stackedModal.html',
-      size: 'sm',
-      controller: function($scope) {
-        $scope.name = 'top';  
-      }
-    });
-  };
-
   $ctrl.toggleAnimation = function () {
     $ctrl.animationsEnabled = !$ctrl.animationsEnabled;
   };
@@ -230,7 +206,7 @@ app.controller('candidateModalCtrl', function($scope, $http, $route, $uibModal, 
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-angular.module('upApp').controller('ModalInstanceCtrl', function ($uibModalInstance, items) {
+app.controller('ModalInstanceCtrl', function ($uibModalInstance, items) {
   var $ctrl = this;
   $ctrl.items = items;
   $ctrl.selected = {
