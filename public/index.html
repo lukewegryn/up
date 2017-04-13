@@ -244,7 +244,7 @@ angular.module('ui.bootstrap.demo').controller('ModalInstanceCtrl', function ($u
   $ctrl.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
-}
+});
 
 app.controller('logoutCtrl', function($scope, $http, User, $location, $route) {
     $http.get(host + "/api/registered/logout")
