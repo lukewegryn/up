@@ -280,6 +280,7 @@ app.controller("voteCtrl", function ($scope, $http, User) {
             if(response.data.success == true){
                 console.log(response.data.points) 
                 id.x.points = id.x.points + 1
+                getPointsRemaining()
             } else {
                 $scope.message = response.data.message
             }
@@ -288,7 +289,6 @@ app.controller("voteCtrl", function ($scope, $http, User) {
             console.log('Error:')
             console.log(error)
         })
-        getPointsRemaining()
     }
 });
 
