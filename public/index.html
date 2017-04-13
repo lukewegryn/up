@@ -67,6 +67,22 @@
     <div ng-view></div>
 </div>
 
+<div ng-controller="modalCtrl">
+<button class="btn" ng-click="open()">Open Modal</button>
+<div modal="showModal" close="cancel()">
+  <div class="modal-header">
+      <h4>Modal Dialog</h4>
+  </div>
+  <div class="modal-body">
+      <p>Example paragraph with some text.</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-success" ng-click="ok()">Okay</button>
+    <button class="btn" ng-click="cancel()">Cancel</button>
+  </div>
+</div>
+</div>
+
 </div>
 
 <script>
@@ -77,7 +93,7 @@ var pusher = new Pusher('ba3b3cba4d81f78b5a20', {
 
     // Enable pusher logging - don't include this in production
 
-var app = angular.module('upApp', ["ngRoute", 'ui.bootstrap', 'ngAnimate']);
+var app = angular.module('upApp', ['ngRoute', 'ui.bootstrap', 'ngAnimate', 'ngTouch']);
 
 // Create the factory that share the Fact
 app.factory('User', function(){
