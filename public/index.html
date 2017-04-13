@@ -67,22 +67,6 @@
     <div ng-view></div>
 </div>
 
-<div ng-controller="modalCtrl">
-<button class="btn" ng-click="open()">Open Modal</button>
-<div modal="showModal" close="cancel()">
-  <div class="modal-header">
-      <h4>Modal Dialog</h4>
-  </div>
-  <div class="modal-body">
-      <p>Example paragraph with some text.</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-success" ng-click="ok()">Okay</button>
-    <button class="btn" ng-click="cancel()">Cancel</button>
-  </div>
-</div>
-</div>
-
 </div>
 
 <script>
@@ -125,6 +109,10 @@ app.config(function($routeProvider) {
     .when("/candidates", {
         templateUrl : "candidates.htm",
         controller : "candidatesCtrl"
+    })
+    .when("/modal", {
+      templateUrl : "modal.htm",
+      controller : "modalCtrl"
     })
     .when("/logout", {
         template : "<h3>You have been logged out.</h3>",
