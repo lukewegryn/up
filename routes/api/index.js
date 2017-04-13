@@ -149,7 +149,7 @@ router.get('/privileged/listUsers', function(req, res, next){
 	})
 })
 /* GET users listing. */
-router.post('/privileged/newCandidate', function(req, res, next) {
+router.post('/registered/newCandidate', function(req, res, next) {
 	// curl --data "name=Test" http://127.0.0.1:3000/api/newCandidate
 	var db = mongoose.connection;
 

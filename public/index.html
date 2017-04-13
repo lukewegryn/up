@@ -43,7 +43,7 @@
         <li><a ng-show="isRegistered()" href="#vote">Vote</a></li>
         <li><a ng-show="isPrivileged()" href="#users">Users</a></li>
         <li><a ng-show="!isRegistered()" href="#register">Register</a></li>
-        <li><a ng-show="isPrivileged()" href="#candidates">Candidates</a></li>
+        <li><a ng-show="isRegistered()" href="#candidates">Candidates</a></li>
         <li><a ng-show="isRegistered()" href="#logout">Logout</a></li>
       </ul>
     </div><!--/.nav-collapse -->
@@ -160,7 +160,7 @@ app.controller('logoutCtrl', function($scope, $http, User, $location, $route) {
 
 app.controller('candidatesCtrl', function($scope, $http, $location) {
     $scope.create_candidate = function(){
-        $http.post(host + "/api/privileged/newCandidate", {
+        $http.post(host + "/api/registered/newCandidate", {
             'candidate_name': $scope.candidate_name
         })
         .then(function(response) {
