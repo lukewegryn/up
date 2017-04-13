@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "start": "pm2 start ./bin/www",
-    "restart": "pm2 restart ./bin/www",
+    "restart": "pm2 startOrRestart ecosystem.config.js",
     "test": "pm2 restart ./bin/www && sleep 1s && mocha",
-    "stop" : "pm2 stop ./bin/www"
+    "stop": "pm2 stop ./bin/www",
+    "deploy": "pm2 deploy ecosystem.config.js production"
   },
   "dependencies": {
     "body-parser": "~1.16.0",
@@ -16,14 +17,15 @@
     "morgan": "~1.7.0",
     "pug": "~2.0.0-beta10",
     "serve-favicon": "~2.3.2",
-    "mongoose":"~4.9.4",
+    "mongoose": "~4.9.4",
     "express-session": "~1.15.2",
     "pusher": "~1.5.1"
   },
   "devDependencies": {
-    "mocha": "~3.2.0",
-    "request": "~2.81.0",
     "expect": "~1.20.2",
+    "mocha": "~3.2.0",
+    "pm2": "^2.4.4",
+    "request": "~2.81.0",
     "request-mocha": "~0.2.0",
     "superagent": "~3.5.2"
   }
