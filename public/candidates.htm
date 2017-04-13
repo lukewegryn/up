@@ -19,4 +19,6 @@
     </form>
     </div>
 </div>
-<button type="button" class="btn btn-default" ng-click="candidateModalCtrl.open()">Open me!</button>
+<div ng-controller="candidateModalCtrl as $ctrl" class="modal-demo">
+<button type="button" class="btn btn-default" ng-click="$ctrl.open()">Open me!</button>
+</div>
