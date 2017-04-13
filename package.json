@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "pm2 start ./bin/www",
+    "restartLocal": "pm2 startOrRestart ./bin/www",
     "restart": "pm2 startOrRestart ecosystem.config.js",
     "test": "pm2 restart ./bin/www && sleep 1s && mocha",
     "stop": "pm2 stop ./bin/www",
