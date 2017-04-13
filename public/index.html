@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="css/template_mods.css">
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
 </head>
-<script src="js/angularjs/1.4.8/angular.min.js"></script>
-<script src="js/angularjs/1.4.8/angular-touch.js"></script>
-<script src="js/angularjs/1.4.8/angular-animate.js"></script>
-<script src="js/angularjs/1.4.8/angular-route.js"></script>
-<script src="js/angularjs/ui-bootstrap-tpls-2.5.0.min.js"></script>
+<script src="js/angularjs/angular-1.6.4/angular.min.js"></script>
+<script src="js/angularjs/angular-1.6.4/angular-touch.min.js"></script>
+<script src="js/angularjs/angular-1.6.4/angular-animate.min.js"></script>
+<script src="js/angularjs/angular-1.6.4/angular-route.min.js"></script>
 <script src="js/pusher/pusher.min.js"></script>
+<script src="js/angularjs/ui-bootstrap-tpls-2.5.0.min.js"></script>
 
 <body>
 
@@ -42,12 +42,12 @@
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#/">Main</a></li>
-        <li><a ng-show="!isRegistered()" href="#login">Login</a></li>
-        <li><a ng-show="isRegistered()" href="#vote">Vote</a></li>
-        <li><a ng-show="isPrivileged()" href="#users">Users</a></li>
-        <li><a ng-show="!isRegistered()" href="#register">Register</a></li>
-        <li><a ng-show="isRegistered()" href="#candidates">Candidates</a></li>
-        <li><a ng-show="isRegistered()" href="#logout">Logout</a></li>
+        <li><a ng-show="!isRegistered()" href="#!/login">Login</a></li>
+        <li><a ng-show="isRegistered()" href="#!/vote">Vote</a></li>
+        <li><a ng-show="isPrivileged()" href="#!/users">Users</a></li>
+        <li><a ng-show="!isRegistered()" href="#!/register">Register</a></li>
+        <li><a ng-show="isRegistered()" href="#!/candidates">Candidates</a></li>
+        <li><a ng-show="isRegistered()" href="#!/logout">Logout</a></li>
       </ul>
     </div><!--/.nav-collapse -->
   </div>
@@ -67,17 +67,20 @@
     <div ng-view></div>
 </div>
 
+<div ng-controller="modalCtrl as $ctrl">   
+</div>
+
 </div>
 
 <script>
-host = "http://ec2-34-206-3-241.compute-1.amazonaws.com" <!--"http://localhost:3000"-->
+host = "http://localhost:3000" <!--"http://ec2-34-206-3-241.compute-1.amazonaws.com"--> <!--"http://localhost:3000"-->
 var pusher = new Pusher('ba3b3cba4d81f78b5a20', {
   encrypted: true
 });
 
     // Enable pusher logging - don't include this in production
 
-var app = angular.module('upApp', ['ngRoute', 'ui.bootstrap.modal', 'ngAnimate', 'ngTouch']);
+var app = angular.module('upApp', ['ngRoute','ui.bootstrap','ngAnimate']);
 
 // Create the factory that share the Fact
 app.factory('User', function(){
@@ -111,13 +114,45 @@ app.config(function($routeProvider) {
         controller : "candidatesCtrl"
     })
     .when("/modal", {
-      templateUrl : "modal.htm",
-      controller : "modalCtrl"
+        templateUrl : "modal.htm",
+        controller : "ModalDemoCtrl"
     })
     .when("/logout", {
         template : "<h3>You have been logged out.</h3>",
         controller : "logoutCtrl"
     })
+});
+
+app.controller('modalCtrl', function($scope, $uibModal){
+  var $ctrl = this
+  console.log($ctrl)
+  $ctrl.items = ['item1', 'item2', 'item3'];
+  var moduleInstance = $uibModal.open(
+  {   templateUrl:'modal.htm',
+      controllerAs: '$ctrl',
+      controller: 'modalInstanceCtrl',
+      resolve: {
+        items: function () {
+          return $ctrl.items;
+        }
+      }
+  })
+})
+
+app.controller('modalInstanceCtrl', function ($uibModalInstance, items) {
+  var $ctrl = this;
+  $ctrl.items = items;
+  $ctrl.selected = {
+    item: $ctrl.items[0]
+  };
+
+  $ctrl.ok = function () {
+    $uibModalInstance.close($ctrl.selected.item);
+  };
+
+  $ctrl.cancel = function () {
+    $uibModalInstance.dismiss('cancel');
+  };
 });
 
 app.controller('navCtrl', function($scope, $http, User) {
@@ -148,25 +183,10 @@ app.controller('navCtrl', function($scope, $http, User) {
     };
 });
 
-app.controller('mainCtrl', function($scope, $http, User, $route) {
+app.controller('mainCtrl',function($scope, $http, User, $route) {
 
 });
 
-app.controller("modalCtrl", function($scope) {
-
-  $scope.open = function() {
-    $scope.showModal = true;
-  };
-
-  $scope.ok = function() {
-    $scope.showModal = false;
-  };
-
-  $scope.cancel = function() {
-    $scope.showModal = false;
-  };
-
-});
 
 app.controller('logoutCtrl', function($scope, $http, User, $location, $route) {
     $http.get(host + "/api/registered/logout")
