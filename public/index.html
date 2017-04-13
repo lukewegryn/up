@@ -77,7 +77,7 @@ var pusher = new Pusher('ba3b3cba4d81f78b5a20', {
 
     // Enable pusher logging - don't include this in production
 
-var app = angular.module('myApp', ["ngRoute", 'ui.bootstrap', 'ngAnimate']);
+var app = angular.module('upApp', ["ngRoute", 'ui.bootstrap', 'ngAnimate']);
 
 // Create the factory that share the Fact
 app.factory('User', function(){
@@ -230,7 +230,7 @@ app.controller('candidateModalCtrl', function($scope, $http, $route, $uibModal, 
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-angular.module('ui.bootstrap.demo').controller('ModalInstanceCtrl', function ($uibModalInstance, items) {
+angular.module('upApp').controller('ModalInstanceCtrl', function ($uibModalInstance, items) {
   var $ctrl = this;
   $ctrl.items = items;
   $ctrl.selected = {
