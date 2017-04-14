@@ -14,8 +14,12 @@
 <script src="js/angularjs/angular-1.6.4/angular-touch.min.js"></script>
 <script src="js/angularjs/angular-1.6.4/angular-animate.min.js"></script>
 <script src="js/angularjs/angular-1.6.4/angular-route.min.js"></script>
+<script src="js/angularjs/marked.min.js"></script>
+<script src="js/angularjs/highlight.js"></script>
+<script src="js/angularjs/angular-md.min.js"></script>
 <script src="js/pusher/pusher.min.js"></script>
 <script src="js/angularjs/ui-bootstrap-tpls-2.5.0.min.js"></script>
+
 
 <body>
 
@@ -77,7 +81,7 @@ var pusher = new Pusher('ba3b3cba4d81f78b5a20', {
 
     // Enable pusher logging - don't include this in production
 
-var app = angular.module('upApp', ['ngRoute','ui.bootstrap','ngAnimate']);
+var app = angular.module('upApp', ['ngRoute','ui.bootstrap','ngAnimate','yaru22.md']);
 
 // Create the factory that share the Fact
 app.factory('User', function(){
@@ -212,7 +216,8 @@ app.controller('logoutCtrl', function($scope, $http, User, $location, $route) {
 app.controller('candidatesCtrl', function($scope, $http, $location) {
     $scope.create_candidate = function(){
         $http.post(host + "/api/registered/newCandidate", {
-            'candidate_name': $scope.candidate_name
+            'candidate_name': $scope.candidate_name,
+            'candidate_description': $scope.candidate_description
         })
         .then(function(response) {
             if(response.data.success == true){

@@ -1,5 +1,6 @@
 <h1>Candidates</h1>
 <br>
+
 <div class="panel panel-primary">
     <div class="panel-heading">Nominate a Candidate</div>
     <div class="panel-body">
@@ -8,14 +9,14 @@
         <h4>{{message}}</h4>
     </div>
         <div class="form-group">
-            <div class="input-group input-group-md">
-                <span class="input-group-addon">Name</span>
-                <input type="text" ng-model="candidate_name" class="form-control">
-                <span class="input-group-btn">
-                    <button ng-click="create_candidate()" type="submit" class="btn btn-md btn-default">Nominate</button>
-                </span>
-            </div>
+            <label for="candidate">Candidate</label>
+            <input type="text" class="form-control" ng-model="candidate_name" id="candidate">
         </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea type="textarea" class="form-control" ng-model="candidate_description" id="description"></textarea>
+        </div>
+        <button ng-click="create_candidate()" type="submit" class="btn btn-md btn-default">Nominate</button>
     </form>
     </div>
 </div>

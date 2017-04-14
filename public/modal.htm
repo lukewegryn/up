@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h3 class="modal-title" id="modal-title">{{ $ctrl.items.name }}</h3>
+    <h1 class="modal-title" id="modal-title">{{ $ctrl.items.name }}</h1>
 </div>
 <div class="modal-body" id="modal-body">
     <!--<ul>
@@ -7,7 +7,8 @@
             <a href="#" ng-click="$event.preventDefault(); $ctrl.selected.item = item">{{ item }}</a>
         </li>
     </ul>-->
-    Points: <b>{{ $ctrl.items.points }}</b>
+    <md ng-model="$ctrl.items.description">
+    </md>
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">Close</button>

@@ -154,10 +154,11 @@ router.post('/registered/newCandidate', function(req, res, next) {
 	var db = mongoose.connection;
 
 	var candidate_name = req.body.candidate_name
+	var candidate_description = req.body.candidate_description
 
 	//db.on('error', function(){res.send("Connection error")})
 	var Candidate = models.candidate
-	var candidate = new Candidate({ name: candidate_name, points:0})
+	var candidate = new Candidate({ name: candidate_name, description: candidate_description, points:0})
 	candidate.save(function (err, user){
 		if(err) {
 			res.send(JSON.stringify({success:false, message:"Unable to create a candidate."}))
