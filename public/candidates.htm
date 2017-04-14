@@ -14,7 +14,8 @@
         </div>
         <div class="form-group">
             <label for="description">Description</label>
-            <textarea type="textarea" class="form-control" ng-model="candidate_description" id="description"></textarea>
+            <small id="mdHelp" class="form-text text-muted">Markdown</small>
+            <textarea type="textarea" rows="10" class="form-control" ng-model="candidate_description" id="description"></textarea>
         </div>
         <button ng-click="create_candidate()" type="submit" class="btn btn-md btn-default">Nominate</button>
     </form>
