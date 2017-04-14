@@ -67,9 +67,6 @@
     <div ng-view></div>
 </div>
 
-<div ng-controller="modalCtrl as $ctrl">   
-</div>
-
 </div>
 
 <script>
@@ -113,41 +110,52 @@ app.config(function($routeProvider) {
         templateUrl : "candidates.htm",
         controller : "candidatesCtrl"
     })
-    .when("/modal", {
-        templateUrl : "modal.htm",
-        controller : "ModalDemoCtrl"
-    })
     .when("/logout", {
         template : "<h3>You have been logged out.</h3>",
         controller : "logoutCtrl"
     })
 });
 
-app.controller('modalCtrl', function($scope, $uibModal){
+app.controller('modalCtrl', function($scope, $http, $uibModal){
   var $ctrl = this
-  console.log($ctrl)
-  $ctrl.items = ['item1', 'item2', 'item3'];
-  var moduleInstance = $uibModal.open(
-  {   templateUrl:'modal.htm',
-      controllerAs: '$ctrl',
-      controller: 'modalInstanceCtrl',
-      resolve: {
-        items: function () {
-          return $ctrl.items;
+  //console.log($ctrl)
+  $ctrl.open = function (candidate) {
+    $ctrl.items = {name:candidate.name}
+    $http.post(host + "/api/registered/candidate", {
+        'candidate_id': candidate._id
+    })
+    .then(function(response) {
+        if(response.data.success == true){
+            $ctrl.items = response.data.candidate
+            var moduleInstance = $uibModal.open(
+            {   templateUrl:'modal.htm',
+                controllerAs: '$ctrl',
+                controller: 'modalInstanceCtrl',
+                resolve: {
+                  items: function () {
+                    return $ctrl.items;
+                  }
+                }
+            })
+        } else {
+            console.log(response.data)
         }
-      }
-  })
+    }, function(error) {
+        console.log('Error:')
+        console.log(error)
+    })
+  }
 })
 
 app.controller('modalInstanceCtrl', function ($uibModalInstance, items) {
   var $ctrl = this;
   $ctrl.items = items;
-  $ctrl.selected = {
+  /*$ctrl.selected = {
     item: $ctrl.items[0]
-  };
+  };*/
 
   $ctrl.ok = function () {
-    $uibModalInstance.close($ctrl.selected.item);
+    $uibModalInstance.close(/*$ctrl.selected.item*/);
   };
 
   $ctrl.cancel = function () {

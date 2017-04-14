@@ -167,6 +167,20 @@ router.post('/registered/newCandidate', function(req, res, next) {
 	})
 })
 
+router.post('/registered/candidate', function(req, res, next) {
+	var db = mongoose.connection;
+
+	var candidate_id = req.body.candidate_id
+	var Candidate = models.candidate
+	Candidate.findOne({_id: candidate_id},function(err, candidate){
+		if(err) {
+			res.send(JSON.stringify({success:false, message:"Unable to get that candidate."}))
+			return
+		}
+		res.send(JSON.stringify({success: true, candidate: candidate}))
+	})
+})
+
 router.get('/privileged/updateCandidate', function(req, res, next){
 	res.send('Update Candidates')
 })
