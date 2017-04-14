@@ -111,7 +111,7 @@ router.post('/registered/upvote/', function(req, res, next){
 						res.send(JSON.stringify({success:false, message:err}))
 						return
 					} else {
-						pusher.trigger('upvote-channel', 'upvote-event', {
+						pusher.trigger('vote-channel', 'vote-up-event', {
 							  "message": "update"
 							});
 						res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
@@ -179,6 +179,25 @@ router.post('/registered/candidate', function(req, res, next) {
 			return
 		}
 		res.send(JSON.stringify({success: true, candidate: candidate}))
+	})
+})
+
+router.post('/privileged/deleteCandidate', function(req, res, next) {
+	var db = mongoose.connection;
+
+	var candidate_id = req.body.id
+	console.log(candidate_id)
+	var Candidate = models.candidate
+	Candidate.findOneAndRemove({ _id: candidate_id },function(err, candidate){
+		if(err) {
+			res.send(JSON.stringify({success:false, message:"Unable to delete that candidate."}))
+			return
+		} else {
+			pusher.trigger('vote-channel', 'vote-delete-event', {
+								  "message": "delete"
+								});
+			res.send(JSON.stringify({success: true, candidate: candidate}))
+		}
 	})
 })
 

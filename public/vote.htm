@@ -18,7 +18,7 @@
   <div class="panel-body">
     <table class="table">
       <thead>
-        <tr><th>Upvote</th><th>Candidate</th><th>Points</th></tr>
+        <tr><th>Upvote</th><th>Candidate</th><th>Points</th><th ng-if="privilege==1">Delete</th></tr>
       </thead>
       <tbody>
         <tr ng-repeat="x in candidates|orderBy:orderByField:reverseSort">
@@ -30,6 +30,7 @@
             </div>
           </td>
           <td>{{ x.points }}</td>
+          <td ng-click="delete(this)" ng-if="privilege==1"><span><i class="fa fa-trash faa-fast faa-burst animated-active" aria-hidden="true"></i></span></td>
         </tr>
       </tbody>
     </table>

@@ -74,7 +74,9 @@
 </div>
 
 <script>
-host = "http://ec2-34-206-3-241.compute-1.amazonaws.com" <!--"http://localhost:3000"-->
+var production = true
+host = production ? "http://ec2-34-206-3-241.compute-1.amazonaws.com" : "http://localhost:3000"
+
 var pusher = new Pusher('ba3b3cba4d81f78b5a20', {
   encrypted: true
 });
@@ -289,7 +291,7 @@ app.controller("loginCtrl", function ($scope, $http, $route, $location, User) {
 		})
     }
 });
-app.controller("voteCtrl", function ($scope, $http, User) {
+app.controller("voteCtrl", function ($scope, $http, $route, User) {
 
     var getVotes = function(){
         $http.get(host + "/api/registered/listCandidates")
@@ -314,8 +316,12 @@ app.controller("voteCtrl", function ($scope, $http, User) {
     }
 
     Pusher.logToConsole = true;
-    var channel = pusher.subscribe('upvote-channel');
-    channel.bind('upvote-event', function(data) {
+    var channel = pusher.subscribe('vote-channel');
+    channel.bind('vote-up-event', function(data) {
+      getVotes()
+    });
+
+    channel.bind('vote-delete-event', function(data) {
       getVotes()
     });
 
@@ -324,6 +330,7 @@ app.controller("voteCtrl", function ($scope, $http, User) {
     $scope.reverseSort = true;
 
     $scope.username = User.username
+    $scope.privilege = User.privilege
     getVotes()
 
     $scope.upvote = function(id){
@@ -336,6 +343,24 @@ app.controller("voteCtrl", function ($scope, $http, User) {
                 console.log(response.data.points) 
                 id.x.points = id.x.points + 1
                 getPointsRemaining()
+            } else {
+                $scope.message = response.data.message
+            }
+            console.log(response.data)
+        }, function(error) {
+            console.log('Error:')
+            console.log(error)
+        })
+    }
+
+    $scope.delete = function(id){
+        console.log(id.x._id)
+        $http.post(host + "/api/privileged/deleteCandidate", {
+            'id': id.x._id
+        })
+        .then(function(response) {
+            if(response.data.success == true){
+                console.log(response.data) 
             } else {
                 $scope.message = response.data.message
             }
