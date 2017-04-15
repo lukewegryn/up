@@ -96,7 +96,7 @@ router.get('/registered/pointsRemaining', function(req, res, next){
 router.post('/registered/upvote/', function(req, res, next){
 	var User = models.user
 	sess=req.session
-	User.findOne({_id: sess.userid}, function(err,user){
+	User.findOne({_id: sess.user_id}, function(err,user){
 		if (user.points <= 0){
 			res.send(JSON.stringify({success:false,message:"You are out of points!"}))
 			return
