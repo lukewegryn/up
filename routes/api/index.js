@@ -104,21 +104,29 @@ router.post('/registered/upvote/', function(req, res, next){
 			User.findOneAndUpdate({_id: sess.user_id}, {$inc: {"points":-1}}, function(err2, users){
 				if (err) {
 					res.send(JSON.stringify({success:false, message:err2}))
+					return
+				} else{
+					var Candidate = models.candidate
+					Candidate.findOneAndUpdate({_id: req.body.id}, {$inc: {"points":1}}, function(err, candidate){
+						//if (err) res.send(JSON.stringify(err))
+						if (err) {
+							res.send(JSON.stringify({success:false, message:err}))
+							return
+						} else {
+							User.findOneAndUpdate({_id: candidate.nominatedBy}, {$inc: {"points":1}}, function(err2, users){
+							if (err) {
+								res.send(JSON.stringify({success:false, message:"Could not give nominatedBy user points."}))
+								return
+							} else{
+								pusher.trigger('vote-channel', 'vote-up-event', {
+									  "message": "update"
+									});
+								res.send(JSON.stringify({success: true, message: "Points added!", points: candidate.points}))
+								return
+							}
+						}
+					})
 				}
-				var Candidate = models.candidate
-				Candidate.findOneAndUpdate({_id: req.body.id}, {$inc: {"points":1}}, function(err, candidates){
-					//if (err) res.send(JSON.stringify(err))
-					if (err) {
-						res.send(JSON.stringify({success:false, message:err}))
-						return
-					} else {
-						pusher.trigger('vote-channel', 'vote-up-event', {
-							  "message": "update"
-							});
-						res.send(JSON.stringify({success: true, message: "Points added!", points: candidates.points}))
-						return
-					}
-				})
 			})
 		}
 	})
