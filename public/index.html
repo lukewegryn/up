@@ -320,6 +320,7 @@ app.controller("voteCtrl", function ($scope, $http, $route, User) {
     var channel = pusher.subscribe('vote-channel');
     channel.bind('vote-up-event', function(data) {
       getVotes()
+      getPointsRemaining()
     });
 
     channel.bind('vote-delete-event', function(data) {

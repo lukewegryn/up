@@ -112,7 +112,14 @@ router.post('/registered/upvote/', function(req, res, next){
 						if (err) {
 							res.send(JSON.stringify({success:false, message:err}))
 							return
-						} else {
+						} else if (users._id == candidate.nominatedBy){
+							pusher.trigger('vote-channel', 'vote-up-event', {
+										  "message": "update"
+										});
+							res.send(JSON.stringify({success: true, message: "Points added! But you don't get points for voting for yourself...", points: candidate.points}))
+							return
+						}
+						else {
 							User.findOneAndUpdate({_id: candidate.nominatedBy}, {$inc: {"points":1}}, function(err2, users){
 								if (err) {
 									res.send(JSON.stringify({success:false, message:"Could not give nominatedBy user points."}))
