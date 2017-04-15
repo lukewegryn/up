@@ -23,6 +23,7 @@ router.post('/login',function(req,res,next){
 		if (user) {
 			sess=req.session
 			sess.username = req.body.username
+			sess.user_id = user._id
 			console.log(user)
 			console.log(user.privilege)
 			sess.auth = user.privilege
@@ -83,7 +84,7 @@ router.get('/currentPrivilege', function(req, res, next){
 router.get('/registered/pointsRemaining', function(req, res, next){
 	var User = models.user
 	sess=req.session
-	User.findOne({username: sess.username}, function(err,user){
+	User.findOne({_id: sess.user_id}, function(err,user){
 		if(err){
 			res.send(JSON.stringify({success:false,message:err}))
 		} else {
@@ -95,12 +96,12 @@ router.get('/registered/pointsRemaining', function(req, res, next){
 router.post('/registered/upvote/', function(req, res, next){
 	var User = models.user
 	sess=req.session
-	User.findOne({username: sess.username}, function(err,user){
+	User.findOne({_id: sess.userid}, function(err,user){
 		if (user.points <= 0){
 			res.send(JSON.stringify({success:false,message:"You are out of points!"}))
 			return
 		} else {
-			User.findOneAndUpdate({username: sess.username}, {$inc: {"points":-1}}, function(err2, users){
+			User.findOneAndUpdate({_id: sess.user_id}, {$inc: {"points":-1}}, function(err2, users){
 				if (err) {
 					res.send(JSON.stringify({success:false, message:err2}))
 				}
@@ -155,10 +156,11 @@ router.post('/registered/newCandidate', function(req, res, next) {
 
 	var candidate_name = req.body.candidate_name
 	var candidate_description = req.body.candidate_description
+	sess=req.session
 
 	//db.on('error', function(){res.send("Connection error")})
 	var Candidate = models.candidate
-	var candidate = new Candidate({ name: candidate_name, description: candidate_description, points:0})
+	var candidate = new Candidate({ name: candidate_name, description: candidate_description, points:0, nominatedBy: sess.user_id})
 	candidate.save(function (err, user){
 		if(err) {
 			res.send(JSON.stringify({success:false, message:"Unable to create a candidate."}))
