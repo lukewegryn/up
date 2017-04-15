@@ -46,7 +46,7 @@ router.post('/newUser', function(req,res,next){
 	var db = mongoose.connection;
 
 	var user_username = req.body.username
-	var user_password = "" //req.body.password
+	var user_password = req.body.password
 
 	if (!user_username){
 		res.send(JSON.stringify({success:false, message: "The username must be at least one character."}))
