@@ -249,7 +249,8 @@ app.controller('usersCtrl', function($scope, $http) {
 app.controller('registerCtrl', function($scope, $http, $route, $location, User) {
     $scope.register = function(){
     	$http.post(host + "/api/newUser", {
-    		'username': $scope.username
+    		'username': $scope.username,
+        'password': $scope.password
     	})
 	    .then(function(response) {
 	        if(response.data.success == true){
