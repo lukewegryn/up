@@ -84,7 +84,7 @@ router.get('/currentPrivilege', function(req, res, next){
 router.get('/registered/pointsRemaining', function(req, res, next){
 	var User = models.user
 	sess=req.session
-	User.findOne({_id: sess.user_id}, function(err,user){
+	User.findOne({username: sess.username}, function(err,user){
 		if(err){
 			res.send(JSON.stringify({success:false,message:err}))
 		} else {
@@ -96,12 +96,12 @@ router.get('/registered/pointsRemaining', function(req, res, next){
 router.post('/registered/upvote/', function(req, res, next){
 	var User = models.user
 	sess=req.session
-	User.findOne({_id: sess.user_id}, function(err,user){
+	User.findOne({username: sess.username}, function(err,user){
 		if (user.points <= 0){
 			res.send(JSON.stringify({success:false,message:"You are out of points!"}))
 			return
 		} else {
-			User.findOneAndUpdate({_id: sess.user_id}, {$inc: {"points":-1}}, function(err2, users){
+			User.findOneAndUpdate({username: sess.username}, {$inc: {"points":-1}}, function(err2, users){
 				if (err) {
 					res.send(JSON.stringify({success:false, message:err2}))
 					return
