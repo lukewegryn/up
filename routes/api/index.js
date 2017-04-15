@@ -182,6 +182,9 @@ router.post('/registered/newCandidate', function(req, res, next) {
 			res.send(JSON.stringify({success:false, message:"Unable to create a candidate."}))
 			return
 		}
+		pusher.trigger('vote-channel', 'vote-new-candidate-event', {
+										  "message": "new candidate"
+										});
 		res.send(JSON.stringify({success:true, message:"" + candidate_name + " created sucessfully!"}))
 	})
 })

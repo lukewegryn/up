@@ -327,6 +327,10 @@ app.controller("voteCtrl", function ($scope, $http, $route, User) {
       getVotes()
     });
 
+    channel.bind('vote-new-candidate-event', function(data)){
+      getVotes()
+    }
+
     getPointsRemaining()
     $scope.orderByField = 'points';
     $scope.reverseSort = true;
